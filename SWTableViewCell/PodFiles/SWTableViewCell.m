@@ -627,6 +627,16 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
     }
 }
 
+// JM: Need to re-enable tapGestureRecognizer when dragging stops and it won't decelerate
+// (i.e. scrollViewDidEndDecelerating won't get called). This can happen when cell has only
+// left or right buttons, and you drag completely to center and release.
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate) {
+      self.tapGestureRecognizer.enabled = YES;
+    }
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     [self setCellState];
