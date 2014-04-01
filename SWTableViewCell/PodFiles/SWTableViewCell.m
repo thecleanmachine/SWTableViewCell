@@ -534,7 +534,8 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
             }
             else
             {
-                if (targetContentOffset->x >= ([self utilityButtonsPadding] - [self rightUtilityButtonsWidth] / 2))
+                // JM: Changed from 'greater-or-equal' to 'greater'. Otherwise state is miscalculated when no right buttons.
+                if (targetContentOffset->x > ([self utilityButtonsPadding] - [self rightUtilityButtonsWidth] / 2))
                     [self scrollToRight:targetContentOffset];
                 else if (targetContentOffset->x > [self leftUtilityButtonsWidth] / 2)
                     [self scrollToCenter:targetContentOffset];
@@ -553,7 +554,8 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
             }
             else
             {
-                if (targetContentOffset->x <= [self leftUtilityButtonsWidth] / 2)
+                // JM: Changed from 'less-or-equal' to 'less'. Otherwise state is miscalculated when no left buttons.
+                if (targetContentOffset->x < [self leftUtilityButtonsWidth] / 2)
                     [self scrollToLeft:targetContentOffset];
                 else if (targetContentOffset->x < ([self utilityButtonsPadding] - [self rightUtilityButtonsWidth] / 2))
                     [self scrollToCenter:targetContentOffset];
