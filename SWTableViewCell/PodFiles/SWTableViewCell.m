@@ -104,6 +104,8 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
     
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                                            action:@selector(scrollViewUp:)];
+    // JM: Set delegate to self so we can ignore tap gestures within UIControls in the cell.
+    tapGestureRecognizer.delegate = self;
     tapGestureRecognizer.cancelsTouchesInView = NO;
     [cellScrollView addGestureRecognizer:tapGestureRecognizer];
     
@@ -666,8 +668,27 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 #pragma mark - UIGestureRecognizerDelegate
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+  
+    // JM: Added this caveat because previously tapGestureRecognizer did not have a delegate so this would always default to NO for this gestureRecognizer.
+    if (gestureRecognizer == self.tapGestureRecognizer) {
+      return NO;
+    }
+  
     // Return YES so the pan gesture of the containing table view is not cancelled by the long press recognizer
     return YES;
+}
+
+// JM: If touch is on an enabled UIControl, then ignore tap and longPress recognizers.
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+  
+    // If gestureRecognizer is tap or longPress, then ignore touches to enabled UIControls
+    if ((gestureRecognizer == self.tapGestureRecognizer) || (gestureRecognizer == self.longPressGestureRecognizer)) {
+      if ([touch.view isKindOfClass:[UIControl class]] && [(UIControl*)touch.view isEnabled]) {
+        return NO;
+      }
+    }
+  
+    return YES; // default: handle the touch
 }
 
 @end
