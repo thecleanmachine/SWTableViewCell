@@ -679,11 +679,15 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
   
-    // JM: Added this caveat because previously tapGestureRecognizer did not have a delegate so this would always default to NO for this gestureRecognizer.
+    // JM: Added this exception because previously tapGestureRecognizer did not have a delegate so this would always default to NO for this gestureRecognizer.
     if (gestureRecognizer == self.tapGestureRecognizer) {
       return NO;
     }
-  
+    // JM: Added this exception because without it, a long press will also trigger tapGestureRecongizer, so selectRowAtIndexPath: gets called twice for same cell.
+    else if (gestureRecognizer == self.longPressGestureRecognizer && otherGestureRecognizer == self.tapGestureRecognizer) {
+      return NO;
+    }
+
     // Return YES so the pan gesture of the containing table view is not cancelled by the long press recognizer
     return YES;
 }
