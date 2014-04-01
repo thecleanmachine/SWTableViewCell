@@ -10,4 +10,8 @@
 
 @interface SWCellScrollView : UIScrollView <UIGestureRecognizerDelegate>
 
+// JM: Allow app to specify other views with PanGestureRecognizers that should not be allowed to recognize simultaneously with the SWCellScrollView,
+// e.g. if the tableView lives within a horizontally scrolling scrollView.
+@property (nonatomic, strong) NSArray* nonSimultaneousPanGestureViews;
+
 @end

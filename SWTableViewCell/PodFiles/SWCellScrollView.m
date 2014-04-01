@@ -11,6 +11,17 @@
 @implementation SWCellScrollView
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+  
+    // JM: Allow app to specify other views with PanGestureRecognizers that should not be allowed to recognize simultaneously with the SWCellScrollView,
+    // e.g. if the tableView lives within a horizontally scrolling scrollView.
+    if (self.nonSimultaneousPanGestureViews != nil) {
+      if ([gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        if ([self.nonSimultaneousPanGestureViews containsObject:otherGestureRecognizer.view]) {
+          return NO;
+        }
+      }
+    }
+  
     // Find out if the user is actively scrolling the tableView of which this is a member.
     // If they are, return NO, and don't let the gesture recognizers work simultaneously.
     //
