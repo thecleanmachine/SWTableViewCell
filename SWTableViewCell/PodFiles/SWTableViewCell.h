@@ -41,11 +41,17 @@ typedef enum {
 @property (nonatomic, strong) SWCellScrollView *cellScrollView;
 @property (nonatomic, weak) UITableView *containingTableView;
 
+// JM: Making cellState readable in subclasses, in case other controls in cell are affected by state.
+@property (nonatomic, readonly) SWCellState cellState; // The state of the cell within the scroll view, can be left, right or middle
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier containingTableView:(UITableView *)containingTableView leftUtilityButtons:(NSArray *)leftUtilityButtons rightUtilityButtons:(NSArray *)rightUtilityButtons;
 
 - (void)setCellHeight:(CGFloat)height;
 - (void)setBackgroundColor:(UIColor *)backgroundColor;
 - (void)hideUtilityButtonsAnimated:(BOOL)animated;
 - (void)setAppearanceWithBlock:(void (^) ())appearanceBlock force:(BOOL)force;
+
+// JM: Exposing method for subclasses to override to be notified when cellState changes.
+- (void)didSetCellState;
 
 @end

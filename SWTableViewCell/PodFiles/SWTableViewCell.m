@@ -38,6 +38,8 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 
 @implementation SWTableViewCell
 
+@synthesize cellState = _cellState;
+
 #pragma mark Initializers
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier containingTableView:(UITableView *)containingTableView leftUtilityButtons:(NSArray *)leftUtilityButtons rightUtilityButtons:(NSArray *)rightUtilityButtons
@@ -173,6 +175,10 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
     self.tapGestureRecognizer.enabled = YES;
     self.showingSelection = NO;
     self.cellScrollView.scrollEnabled = !self.selected;
+  
+    // JM: Need to update cellState here otherwise it can become out of sync with cell's appearance.
+    // i.e. layoutSubviews resets appearance to reflect 'center' state regardless of actual cellState - now cellState will be updated to match.
+    [self setCellState];
 }
 
 #pragma mark - Properties
@@ -380,6 +386,7 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
         [self.cellScrollView setContentOffset:CGPointMake([self leftUtilityButtonsWidth], 0) animated:YES];
     });
     _cellState = kCellStateCenter;
+    [self didSetCellState];
     
     if ([self.delegate respondsToSelector:@selector(swipeableTableViewCell:scrollingToState:)])
     {
@@ -430,6 +437,7 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 {
     targetContentOffset->x = [self utilityButtonsPadding];
     _cellState = kCellStateRight;
+    [self didSetCellState];
     
     self.longPressGestureRecognizer.enabled = NO;
     self.tapGestureRecognizer.enabled = NO;
@@ -453,6 +461,7 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 {
     targetContentOffset->x = [self leftUtilityButtonsWidth];
     _cellState = kCellStateCenter;
+    [self didSetCellState];
     
     self.longPressGestureRecognizer.enabled = YES;
     self.tapGestureRecognizer.enabled = NO;
@@ -467,6 +476,7 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
 {
     targetContentOffset->x = 0;
     _cellState = kCellStateLeft;
+    [self didSetCellState];
     
     self.longPressGestureRecognizer.enabled = NO;
     self.tapGestureRecognizer.enabled = NO;
@@ -642,6 +652,13 @@ static NSString * const kTableViewCellContentView = @"UITableViewCellContentView
         _cellState = kCellStateLeft;
     else if ([self.cellScrollView contentOffset].x == [self utilityButtonsPadding])
         _cellState = kCellStateRight;
+  
+    [self didSetCellState];
+}
+
+// JM: Exposing method for subclasses to override to be notified when cellState changes.
+- (void)didSetCellState {
+  // No-op. Override in subclass.
 }
 
 #pragma mark - UIGestureRecognizerDelegate
